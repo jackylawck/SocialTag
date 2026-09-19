@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Tag 到處留名</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 依職責依序載入腳本 -->
+  <script src="js/utils.js" defer></script>
+  <script src="js/game.js" defer></script>
+  <script src="js/net.js" defer></script>
+  <script src="js/ui.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body class="bg-slate-100 text-slate-800 p-4 min-h-screen">
+  <div class="max-w-md md:max-w-xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-4">
+    <!-- 頂部標題列 -->
+    <div class="flex justify-between items-center border-b pb-3">
+      <h1 class="font-bold text-lg text-slate-800 tracking-tight" id="app-title">🏷️ Social Tag 到處留名</h1>
+      <span id="role-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-slate-200"></span>
+    </div>
+
+    <!-- 狀態資訊面板 -->
+    <div id="status-panel" class="bg-slate-50 p-3.5 rounded-lg text-sm space-y-1.5 border border-slate-100">
+      <div class="flex justify-between">
+        <span>當前階段：<span id="room-status" class="font-bold text-slate-700">LOBBY</span></span>
+        <span id="sticker-box">手上剩餘：<span id="my-stickers" class="font-bold text-emerald-600">3</span> 張</span>
+      </div>
+      <div class="text-xs text-slate-500">倒數時間：<span id="timer-display" class="font-mono text-indigo-600 font-bold text-sm">--:--</span></div>
+    </div>
+
+    <!-- 大螢幕 Leaderboard 區塊 (ENDED / RECLAIM 階段顯示) -->
+    <div id="leaderboard-box" class="hidden space-y-2 pt-3 border-t">
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
+        <div class="text-xs font-semibold text-amber-700 mb-1">🏆 人氣磁鐵獎（標籤最多）</div>
+        <div id="lb-most-received" class="font-bold text-slate-800"></div>
+      </div>
+      <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+        <div class="text-xs font-semibold text-indigo-700 mb-1">⚡ 閃電外交官（最快送完）</div>
+        <div id="lb-fastest" class="font-bold text-slate-800 text-sm"></div>
+      </div>
+    </div>
+
+    <!-- 大螢幕進度條 (RECLAIM 階段顯示) -->
+    <div id="progress-box" class="hidden space-y-1.5 pt-3 border-t">
+      <div class="flex justify-between text-xs font-semibold text-slate-600">
+        <span>物歸原主進度</span>
+        <span id="progress-text" class="text-indigo-600 font-bold">0%</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+        <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- 主控台按鈕 (Host 專用) -->
+    <div id="host-controls" class="hidden space-y-2 pt-2 border-t">
+      <button id="btn-start" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm">開始活動 (5分鐘)</button>
+      <button id="btn-reclaim" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg text-sm hidden transition shadow-sm">提早進入物歸原主</button>
+    </div>
+
+    <!-- 核心互動名單區 (Client 專用) -->
+    <div id="client-view" class="space-y-3">
+      <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">在場朋友 (點擊貼標籤)</h2>
+      <div id="participant-list" class="space-y-2"></div>
+
+      <div id="received-box" class="pt-4 border-t space-y-2">
+        <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">我身上收到的標籤 (物歸原主用)</h2>
+        <div id="received-list" class="space-y-1"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
