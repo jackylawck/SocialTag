@@ -1,22 +1,44 @@
 /**
  * 🚀 js/app.js
- * 主程式初始化與生命週期管理
  */
-
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const roomId = urlParams.get('room') || 'room_test';
-  const isHost = urlParams.get('role') === 'host';
-  const myName = urlParams.get('name') || (isHost ? '主持人' : `學員_${uid(3)}`);
+  const role = urlParams.get('role');
+  const nameParam = urlParams.get('name');
 
+  UI.renderStaticTexts();
+
+  const hasIdentity = role === 'host' || !!nameParam;
+
+  if (!hasIdentity) {
+    const modal = document.getElementById('entry-modal');
+    modal.classList.remove('hidden');
+
+    document.getElementById('btn-join-host').onclick = () => {
+      const room = document.getElementById('input-room').value.trim() || 'room_test';
+      window.location.search = `?room=${encodeURIComponent(room)}&role=host`;
+    };
+
+    document.getElementById('btn-join-client').onclick = () => {
+      const room = document.getElementById('input-room').value.trim() || 'room_test';
+      const name = document.getElementById('input-name').value.trim() || `學員_${uid(3)}`;
+      window.location.search = `?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
+    };
+    return;
+  }
+
+  const isHost = role === 'host';
+  const myName = nameParam || (isHost ? '主持人' : `學員_${uid(3)}`);
   const myPeerId = isHost ? 'host_peer' : getPersistentPeerId(roomId);
-  document.getElementById('app-title').innerText = `房間: ${roomId}`;
+  
+  document.getElementById('app-title').innerText = `${I18n.t('app_title')} (${roomId})`;
 
   Net.init(roomId, isHost, myPeerId);
 
   if (isHost) {
     window.hostSession = new HostServerSession(roomId);
-    document.getElementById('role-badge').innerText = 'HOST (筆電大螢幕)';
+    document.getElementById('role-badge').innerText = I18n.t('role_host');
     document.getElementById('role-badge').classList.add('bg-amber-100', 'text-amber-800');
     document.getElementById('host-controls').classList.remove('hidden');
     document.getElementById('sticker-box').classList.add('hidden');
@@ -51,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => Net.broadcast(window.hostSession.generateSyncBroadcast()), 150);
   } else {
     window.clientSession = new ClientGameSession(roomId, myPeerId, myName);
-    document.getElementById('role-badge').innerText = `學員: ${myName}`;
+    document.getElementById('role-badge').innerText = `${I18n.t('role_client_prefix')}${myName}`;
     document.getElementById('role-badge').classList.add('bg-emerald-100', 'text-emerald-800');
 
     Net.sendToHost({ type: 'JOIN', peerId: myPeerId, name: myName });
@@ -63,13 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 🛡️ 關閉分頁前的最後一道快照存檔保險
   window.addEventListener('beforeunload', () => {
     if (window.clientSession) window.clientSession.saveSnapshot();
     if (window.hostSession) window.hostSession.saveSnapshot();
   });
 
-  // 安全渲染定時循環
   setInterval(() => {
     try {
       UI.render();
