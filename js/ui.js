@@ -1,0 +1,128 @@
+/**
+ * 🎨 js/ui.js
+ * 渲染與 UI 事件
+ */
+
+const UI = {
+  lastSyncPayload: null,
+
+  handleIncomingData(data) {
+    if (!data || typeof data.type !== 'string') return;
+
+    if (data.type === 'SYNC') {
+      this.lastSyncPayload = data;
+      if (window.clientSession) window.clientSession.applySync(data);
+      this.render();
+    } else if (data.type === 'TRANSFER_REJECT') {
+      if (window.clientSession) window.clientSession.handleReject(data);
+      this.render();
+    } else if (data.type === 'JOIN_REJECTED') {
+      document.getElementById('room-status').innerText = '已錯過開場';
+      document.getElementById('participant-list').innerHTML =
+        '<div class="text-center text-slate-400 py-6 text-sm">活動已經開始，請直接於大螢幕觀戰！</div>';
+      document.getElementById('timer-display').innerText = '--:--';
+      document.getElementById('sticker-box').classList.add('hidden');
+    }
+  },
+
+  render() {
+    try {
+      const sync = this.lastSyncPayload || (window.hostSession ? window.hostSession.generateSyncBroadcast() : null);
+      if (!sync) return;
+
+      document.getElementById('room-status').innerText = sync.status;
+
+      // 倒數時鐘
+      if (sync.status === RoomStatus.ACTIVE && sync.serverStartAt) {
+        const remaining = window.clientSession
+          ? window.clientSession.getRemainingSec(sync.serverStartAt, sync.durationSec)
+          : Math.max(0, Math.ceil(sync.durationSec - (Date.now() - sync.serverStartAt) / 1000));
+        const m = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const s = String(remaining % 60).padStart(2, '0');
+        document.getElementById('timer-display').innerText = `${m}:${s}`;
+      } else if (sync.status === RoomStatus.ENDED) {
+        document.getElementById('timer-display').innerText = '中場結算';
+        if (Net.isHost) document.getElementById('btn-reclaim').classList.remove('hidden');
+      } else if (sync.status === RoomStatus.RECLAIM) {
+        document.getElementById('timer-display').innerText = '物歸原主中';
+      }
+
+      // Leaderboard 榮譽榜
+      const lbBox = document.getElementById('leaderboard-box');
+      if (sync.leaderboard && (sync.status === RoomStatus.ENDED || sync.status === RoomStatus.RECLAIM)) {
+        lbBox.classList.remove('hidden');
+        const mr = sync.leaderboard.mostReceived;
+        document.getElementById('lb-most-received').innerText =
+          mr ? `${mr.avatar} ${mr.name}（累積 ${mr.receivedCount} 張）` : '從缺';
+        const fg = sync.leaderboard.fastestGivers;
+        document.getElementById('lb-fastest').innerText =
+          fg && fg.length ? fg.map(p => `${p.avatar} ${p.name}`).join('、') : '從缺';
+      } else {
+        lbBox.classList.add('hidden');
+      }
+
+      // 進度條
+      if (sync.status === RoomStatus.RECLAIM) {
+        document.getElementById('progress-box').classList.remove('hidden');
+        const pct = Math.round(sync.reclaimProgress * 100);
+        document.getElementById('progress-text').innerText = `${pct}%`;
+        document.getElementById('progress-bar').style.width = `${pct}%`;
+      }
+
+      // Client 介面
+      if (!Net.isHost && window.clientSession) {
+        document.getElementById('my-stickers').innerText = window.clientSession.inventory;
+
+        const pList = document.getElementById('participant-list');
+        pList.innerHTML = '';
+        const others = Object.entries(sync.participants).filter(([pid]) => pid !== Net.myPeerId);
+
+        others.forEach(([pid, p]) => {
+          const isGiven = window.clientSession.givenTo.has(pid);
+          const btn = document.createElement('button');
+          btn.className = `w-full flex justify-between items-center p-2.5 rounded-lg border text-sm transition ${
+            isGiven ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed' : 'bg-white border-slate-300 hover:border-indigo-500'
+          }`;
+          btn.disabled = isGiven || window.clientSession.inventory <= 0 || sync.status !== RoomStatus.ACTIVE;
+          btn.innerHTML = `<span>${p.avatar} ${p.name}</span><span class="text-xs font-semibold">${isGiven ? '已結識' : '貼標籤 ➔'}</span>`;
+          btn.onclick = () => {
+            try {
+              const payload = window.clientSession.createTransferPayload(pid);
+              Net.sendToHost(payload);
+              UI.render();
+            } catch (err) {
+              showToast(err.message, 'warning');
+            }
+          };
+          pList.appendChild(btn);
+        });
+
+        const rList = document.getElementById('received-list');
+        rList.innerHTML = '';
+        if (window.clientSession.receivedStickers.length === 0) {
+          rList.innerHTML = '<div class="text-xs text-slate-400 italic">身上暫時未有標籤</div>';
+        } else {
+          window.clientSession.receivedStickers.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'flex justify-between items-center bg-slate-50 border p-2 rounded text-xs';
+            card.innerHTML = `<span>收到來自 <b>${item.fromName}</b> 的名牌</span>`;
+            if (sync.status === RoomStatus.RECLAIM) {
+              const retBtn = document.createElement('button');
+              retBtn.className = `px-2 py-1 rounded transition ${item.returned ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`;
+              retBtn.innerText = item.returned ? '已物歸原主' : '當面還佢';
+              retBtn.disabled = item.returned;
+              retBtn.onclick = () => {
+                const payload = window.clientSession.createReturnPayload(item.transferId);
+                Net.sendToHost(payload);
+              };
+              card.appendChild(retBtn);
+            }
+            rList.appendChild(card);
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[UI.render Guard]', err);
+    }
+  }
+};
