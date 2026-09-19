@@ -1,10 +1,25 @@
 /**
  * 🎨 js/ui.js
- * 渲染與 UI 事件
+ * 雙語渲染與介面管理
  */
 
 const UI = {
   lastSyncPayload: null,
+
+  // 刷新所有帶有 data-i18n 的靜態文字
+  renderStaticTexts() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.innerText = I18n.t(key);
+    });
+    // 更新語言切換按鈕字樣
+    document.querySelectorAll('.lang-switch-text').forEach(el => {
+      el.innerText = I18n.lang === 'zh' ? 'EN' : '中文';
+    });
+    // 更新輸入框 placeholder
+    const inputName = document.getElementById('input-name');
+    if (inputName) inputName.placeholder = I18n.t('name_placeholder');
+  },
 
   handleIncomingData(data) {
     if (!data || typeof data.type !== 'string') return;
@@ -17,9 +32,9 @@ const UI = {
       if (window.clientSession) window.clientSession.handleReject(data);
       this.render();
     } else if (data.type === 'JOIN_REJECTED') {
-      document.getElementById('room-status').innerText = '已錯過開場';
+      document.getElementById('room-status').innerText = I18n.t('missed_start');
       document.getElementById('participant-list').innerHTML =
-        '<div class="text-center text-slate-400 py-6 text-sm">活動已經開始，請直接於大螢幕觀戰！</div>';
+        `<div class="text-center text-slate-400 py-6 text-sm">${I18n.t('missed_desc')}</div>`;
       document.getElementById('timer-display').innerText = '--:--';
       document.getElementById('sticker-box').classList.add('hidden');
     }
@@ -27,6 +42,7 @@ const UI = {
 
   render() {
     try {
+      this.renderStaticTexts();
       const sync = this.lastSyncPayload || (window.hostSession ? window.hostSession.generateSyncBroadcast() : null);
       if (!sync) return;
 
@@ -41,22 +57,22 @@ const UI = {
         const s = String(remaining % 60).padStart(2, '0');
         document.getElementById('timer-display').innerText = `${m}:${s}`;
       } else if (sync.status === RoomStatus.ENDED) {
-        document.getElementById('timer-display').innerText = '中場結算';
+        document.getElementById('timer-display').innerText = I18n.t('game_ended_title');
         if (Net.isHost) document.getElementById('btn-reclaim').classList.remove('hidden');
       } else if (sync.status === RoomStatus.RECLAIM) {
-        document.getElementById('timer-display').innerText = '物歸原主中';
+        document.getElementById('timer-display').innerText = I18n.t('game_reclaim_title');
       }
 
-      // Leaderboard 榮譽榜
+      // Leaderboard
       const lbBox = document.getElementById('leaderboard-box');
       if (sync.leaderboard && (sync.status === RoomStatus.ENDED || sync.status === RoomStatus.RECLAIM)) {
         lbBox.classList.remove('hidden');
         const mr = sync.leaderboard.mostReceived;
         document.getElementById('lb-most-received').innerText =
-          mr ? `${mr.avatar} ${mr.name}（累積 ${mr.receivedCount} 張）` : '從缺';
+          mr ? `${mr.avatar} ${mr.name}${I18n.t('lb_count', { n: mr.receivedCount })}` : I18n.t('lb_empty');
         const fg = sync.leaderboard.fastestGivers;
         document.getElementById('lb-fastest').innerText =
-          fg && fg.length ? fg.map(p => `${p.avatar} ${p.name}`).join('、') : '從缺';
+          fg && fg.length ? fg.map(p => `${p.avatar} ${p.name}`).join('、') : I18n.t('lb_empty');
       } else {
         lbBox.classList.add('hidden');
       }
@@ -69,7 +85,7 @@ const UI = {
         document.getElementById('progress-bar').style.width = `${pct}%`;
       }
 
-      // Client 介面
+      // 學員名單
       if (!Net.isHost && window.clientSession) {
         document.getElementById('my-stickers').innerText = window.clientSession.inventory;
 
@@ -84,7 +100,7 @@ const UI = {
             isGiven ? 'bg-slate-50 border-slate-200 opacity-50 cursor-not-allowed' : 'bg-white border-slate-300 hover:border-indigo-500'
           }`;
           btn.disabled = isGiven || window.clientSession.inventory <= 0 || sync.status !== RoomStatus.ACTIVE;
-          btn.innerHTML = `<span>${p.avatar} ${p.name}</span><span class="text-xs font-semibold">${isGiven ? '已結識' : '貼標籤 ➔'}</span>`;
+          btn.innerHTML = `<span>${p.avatar} ${p.name}</span><span class="text-xs font-semibold">${isGiven ? I18n.t('btn_tagged') : I18n.t('btn_tag')}</span>`;
           btn.onclick = () => {
             try {
               const payload = window.clientSession.createTransferPayload(pid);
@@ -97,19 +113,20 @@ const UI = {
           pList.appendChild(btn);
         });
 
+        // 收到的標籤
         const rList = document.getElementById('received-list');
         rList.innerHTML = '';
         if (window.clientSession.receivedStickers.length === 0) {
-          rList.innerHTML = '<div class="text-xs text-slate-400 italic">身上暫時未有標籤</div>';
+          rList.innerHTML = `<div class="text-xs text-slate-400 italic">${I18n.t('empty_stickers')}</div>`;
         } else {
           window.clientSession.receivedStickers.forEach(item => {
             const card = document.createElement('div');
             card.className = 'flex justify-between items-center bg-slate-50 border p-2 rounded text-xs';
-            card.innerHTML = `<span>收到來自 <b>${item.fromName}</b> 的名牌</span>`;
+            card.innerHTML = `<span>${I18n.t('received_from', { name: `<b>${item.fromName}</b>` })}</span>`;
             if (sync.status === RoomStatus.RECLAIM) {
               const retBtn = document.createElement('button');
               retBtn.className = `px-2 py-1 rounded transition ${item.returned ? 'bg-slate-200 text-slate-500 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`;
-              retBtn.innerText = item.returned ? '已物歸原主' : '當面還佢';
+              retBtn.innerText = item.returned ? I18n.t('btn_returned') : I18n.t('btn_return');
               retBtn.disabled = item.returned;
               retBtn.onclick = () => {
                 const payload = window.clientSession.createReturnPayload(item.transferId);
