@@ -3,7 +3,6 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  // 1. 預設 fallback 房號改為 0725
   const roomId = urlParams.get('room') || '0725';
   const role = urlParams.get('role');
   const nameParam = urlParams.get('name');
@@ -34,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-join-client').onclick = joinAsClient;
 
-    // 支援學員打完名字直接撳鍵盤 Enter 送出
+    // 支援學員打完名字直接按 Enter 送出
     inputName.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') joinAsClient();
     });
@@ -45,8 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const isHost = role === 'host';
   const myName = nameParam || (isHost ? '主持人' : `學員_${uid(3)}`);
   const myPeerId = isHost ? 'host_peer' : getPersistentPeerId(roomId);
-  
-  document.getElementById('app-title').innerText = `${I18n.t('app_title')} (${roomId})`;
+
+  // 渲染大螢幕獨立房號顯示標籤
+  const displayRoomEl = document.getElementById('display-room-id');
+  if (displayRoomEl) displayRoomEl.innerText = roomId;
 
   Net.init(roomId, isHost, myPeerId);
 
@@ -59,6 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('client-view').classList.add('hidden');
 
     const btnStart = document.getElementById('btn-start');
+    const btnReclaim = document.getElementById('btn-reclaim');
+    const btnReset = document.getElementById('btn-reset');
+
+    // 依水合後的狀態對齊按鈕
     if (window.hostSession.status !== RoomStatus.LOBBY) {
       btnStart.disabled = true;
       btnStart.classList.add('opacity-50', 'cursor-not-allowed');
@@ -73,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    const btnReclaim = document.getElementById('btn-reclaim');
     btnReclaim.onclick = (e) => {
       const reply = window.hostSession.triggerReclaim();
       if (reply) {
@@ -82,6 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
         Net.broadcast(reply);
       }
     };
+
+    // 重設房間：清空硬碟快照並重載頁面回到乾淨的 LOBBY
+    if (btnReset) {
+      btnReset.onclick = () => {
+        if (confirm('確定要清空資料並重新開局？全場學員將重回 LOBBY 狀態。')) {
+          localStorage.removeItem(`ice_h_${roomId}`);
+          window.location.reload();
+        }
+      };
+    }
 
     window.hostSession.recoverTimers();
     setTimeout(() => Net.broadcast(window.hostSession.generateSyncBroadcast()), 150);
