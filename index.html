@@ -35,7 +35,8 @@
           <label class="block text-xs font-semibold text-slate-600" data-i18n="room_label">房間號碼</label>
           <button type="button" id="btn-random-room" class="text-xs text-indigo-600 hover:underline" data-i18n="btn_random_room">🎲 隨機新房</button>
         </div>
-        <input id="input-room" type="text" value="" placeholder="留空將自動生成專屬房號" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <!-- 🌟 加入 inputmode="numeric"，手機點擊自動彈出 9 宮格數字鍵盤 -->
+        <input id="input-room" type="text" inputmode="numeric" maxlength="6" value="" placeholder="留空將自動生成 6 位數字房號" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono tracking-wider">
       </div>
 
       <div class="space-y-3 pt-2">
