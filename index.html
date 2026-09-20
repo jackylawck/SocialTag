@@ -59,10 +59,13 @@
 
   <!-- 主容器 -->
   <div class="max-w-md md:max-w-xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-4">
-    <!-- 頂部標題列與語言切換 -->
+    <!-- 頂部標題列與房號資訊 -->
     <div class="flex justify-between items-center border-b pb-3">
       <div>
-        <h1 class="font-bold text-lg text-slate-800 tracking-tight" id="app-title" data-i18n="app_title">🏷️ Social Tag 到處留名</h1>
+        <h1 class="font-bold text-lg text-slate-800 tracking-tight" data-i18n="app_title">🏷️ Social Tag 到處留名</h1>
+        <div class="text-xs text-slate-500 mt-0.5">
+          <span data-i18n="room_label">房間號碼</span>: <span id="display-room-id" class="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">--</span>
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <span id="role-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-slate-200"></span>
@@ -104,10 +107,13 @@
       </div>
     </div>
 
-    <!-- Host 按鈕 -->
+    <!-- Host 控制區 -->
     <div id="host-controls" class="hidden space-y-2 pt-2 border-t">
       <button id="btn-start" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm" data-i18n="btn_start">開始活動 (5分鐘)</button>
       <button id="btn-reclaim" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg text-sm hidden transition shadow-sm" data-i18n="btn_reclaim">提早進入物歸原主</button>
+      <button id="btn-reset" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium py-1.5 rounded-lg text-xs transition">
+        🔄 重設房間（重新開局）
+      </button>
     </div>
 
     <!-- Client 名單 -->
