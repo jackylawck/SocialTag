@@ -61,6 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const displayRoomEl = document.getElementById('display-room-id');
   if (displayRoomEl) displayRoomEl.innerText = roomId;
 
+  // 🚪 綁定離開房間按鈕 (防呆確認 + 清空快照 + 返回純首頁)
+  const btnLeave = document.getElementById('btn-leave-room');
+  if (btnLeave) {
+    btnLeave.onclick = () => {
+      const confirmMsg = isHost
+        ? I18n.t('confirm_leave_host')
+        : I18n.t('confirm_leave_client');
+
+      if (window.confirm(confirmMsg)) {
+        if (isHost) {
+          localStorage.removeItem(`ice_h_${roomId}`);
+        } else {
+          localStorage.removeItem(`ice_c_${roomId}_${myPeerId}`);
+        }
+        window.location.href = window.location.origin + window.location.pathname;
+      }
+    };
+  }
+
   Net.init(roomId, isHost, myPeerId);
 
   if (isHost) {
