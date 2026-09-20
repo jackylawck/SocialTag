@@ -188,6 +188,7 @@ class HostServerSession {
     this.roomId = roomId;
     this.INITIAL_STICKERS = 3;
     this.GAME_DURATION_SEC = 300;
+    this.MAX_PARTICIPANTS = 50; // 🌟 設定單房保險上限：最多 50 人，防止 Host 筆電過載
 
     this.status = RoomStatus.LOBBY;
     this.seq = 0;
@@ -277,12 +278,27 @@ class HostServerSession {
     const safeName = String(name || '無名氏').slice(0, 16).replace(/[<>"'&]/g, '');
     const safeAvatar = String(avatar || '🙂').slice(0, 4).replace(/[<>"'&]/g, '');
 
+    // 1. 已在名單內的舊學員（重連 / 刷新）放行並更新名字
     if (this.participants[peerId]) {
       this.participants[peerId].name = safeName;
       this.participants[peerId].avatar = safeAvatar;
-    } else if (this.status !== RoomStatus.LOBBY) {
-      return { type: 'JOIN_REJECTED', reason: 'GAME_IN_PROGRESS' };
     } else {
+      // 2. 遊戲進行中不准新學員入場
+      if (this.status !== RoomStatus.LOBBY) {
+        return { type: 'JOIN_REJECTED', reason: 'GAME_IN_PROGRESS' };
+      }
+
+      // 3. 🌟 單房人數上限檢查：超過 50 人拒絕加入
+      const currentCount = Object.keys(this.participants).length;
+      if (currentCount >= this.MAX_PARTICIPANTS) {
+        return { 
+          type: 'JOIN_REJECTED', 
+          reason: 'FULL', 
+          max: this.MAX_PARTICIPANTS 
+        };
+      }
+
+      // 4. 正常新增學員
       this.participants[peerId] = {
         name: safeName,
         avatar: safeAvatar,
