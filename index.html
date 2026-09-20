@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Tag 到處留名</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 🌟 新增：極速生成 QR Code 的純前端庫 -->
+  <!-- 🌟 極速生成 QR Code 的純前端庫 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- 依序載入腳本 -->
   <script src="js/i18n.js" defer></script>
@@ -17,7 +17,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 p-4 min-h-screen">
 
-  <!-- 🚪 角色選擇入口 Modal (保持原有) -->
+  <!-- 🚪 角色選擇入口 Modal -->
   <div id="entry-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-5">
       <div class="flex justify-end">
@@ -64,7 +64,7 @@
 
   <!-- 主容器 -->
   <div class="max-w-md md:max-w-xl mx-auto bg-white rounded-xl shadow-md p-6 space-y-4">
-    <!-- 頂部標題列 -->
+    <!-- 頂部標題列與離開按鈕 -->
     <div class="flex justify-between items-center border-b pb-3">
       <div>
         <h1 class="font-bold text-lg text-slate-800 tracking-tight" data-i18n="app_title">🏷️ Social Tag 到處留名</h1>
@@ -72,17 +72,20 @@
           <span data-i18n="room_label">房間號碼</span>: <span id="display-room-id" class="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">--</span>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 sm:gap-2">
         <span id="role-badge" class="text-xs px-2.5 py-1 rounded-full font-medium bg-slate-200"></span>
         <button onclick="I18n.setLang(I18n.lang === 'zh' ? 'en' : 'zh')" class="text-xs font-semibold px-2 py-0.5 rounded border border-slate-300 hover:bg-slate-100">
           <span class="lang-switch-text">EN</span>
+        </button>
+        <!-- 🚪 離開房間 / 返回首頁 -->
+        <button id="btn-leave-room" class="text-xs font-semibold px-2.5 py-0.5 rounded border border-rose-200 text-rose-600 bg-rose-50 hover:bg-rose-100 transition flex items-center gap-1" data-i18n="btn_leave">
+          🚪 離開
         </button>
       </div>
     </div>
 
     <!-- 🌟 主持人大螢幕專屬：QR Code 掃碼直入區 -->
     <div id="host-invite-box" class="hidden bg-indigo-50/70 border border-indigo-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
-      <!-- 二維碼渲染位置 -->
       <div id="qrcode-container" class="bg-white p-2.5 rounded-xl shadow-sm border border-indigo-100 flex-shrink-0"></div>
       <div class="space-y-1">
         <div class="text-sm font-bold text-indigo-950">📷 手機掃描 QR Code 即刻入場</div>
@@ -129,7 +132,7 @@
     <div id="host-controls" class="hidden space-y-2 pt-2 border-t">
       <button id="btn-start" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm" data-i18n="btn_start">開始活動 (5分鐘)</button>
       <button id="btn-reclaim" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg text-sm hidden transition shadow-sm" data-i18n="btn_reclaim">提早進入物歸原主</button>
-      <button id="btn-reset" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium py-1.5 rounded-lg text-xs transition">
+      <button id="btn-reset" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-medium py-1.5 rounded-lg text-xs transition" data-i18n="btn_reset">
         🔄 重設房間（重新開局）
       </button>
     </div>
