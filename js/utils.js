@@ -1,6 +1,6 @@
 /**
  * 🛠️ js/utils.js
- * 輔助工具：安全隨機數、持久化 PeerID、防疊加 Toast
+ * 輔助工具：安全隨機數、持久化 PeerID、防疊加 Toast、頭像分配器
  */
 
 function uid(len = 8) {
@@ -23,6 +23,18 @@ function getPersistentPeerId(roomId) {
     localStorage.setItem(key, storedId);
   }
   return storedId;
+}
+
+// 🌟 新增：根據 PeerID 哈希值確定性分配生動 Emoji，避免 undefined 報錯
+function getAvatarForPeer(peerId) {
+  const avatars = ['🦊', '🐼', '🐨', '🦁', '🐯', '🦄', '🐙', '🦉', '🐬', '🦔', '🐝', '🐧', '🐶', '🐱'];
+  if (!peerId) return '🙂';
+  let hash = 0;
+  for (let i = 0; i < peerId.length; i++) {
+    hash = (hash << 5) - hash + peerId.charCodeAt(i);
+    hash |= 0;
+  }
+  return avatars[Math.abs(hash) % avatars.length];
 }
 
 function showToast(msg, type = 'info') {
