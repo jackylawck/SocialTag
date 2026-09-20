@@ -16,7 +16,10 @@ const UI = {
     document.querySelectorAll('.lang-switch-text').forEach(el => {
       el.innerText = I18n.lang === 'zh' ? 'EN' : '中文';
     });
-    // 更新輸入框 placeholder
+    // 🌟 更新房間與名字輸入框 placeholder，確保全英/全中切換無死角
+    const inputRoom = document.getElementById('input-room');
+    if (inputRoom) inputRoom.placeholder = I18n.t('room_placeholder_auto');
+
     const inputName = document.getElementById('input-name');
     if (inputName) inputName.placeholder = I18n.t('name_placeholder');
   },
