@@ -71,15 +71,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sticker-box').classList.add('hidden');
     document.getElementById('client-view').classList.add('hidden');
 
-    // 🌟 填入大螢幕學員專屬邀請連結與房號
+    // 🌟 大螢幕 QR Code 生成與顯示
     const inviteBox = document.getElementById('host-invite-box');
     if (inviteBox) {
       inviteBox.classList.remove('hidden');
-      const clientJoinUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(roomId)}`;
-      const inviteUrlEl = document.getElementById('invite-url-text');
       const inviteCodeEl = document.getElementById('invite-room-code');
-      if (inviteUrlEl) inviteUrlEl.innerText = clientJoinUrl;
       if (inviteCodeEl) inviteCodeEl.innerText = roomId;
+
+      const clientJoinUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(roomId)}`;
+      const qrContainer = document.getElementById('qrcode-container');
+      if (qrContainer && typeof QRCode !== 'undefined') {
+        qrContainer.innerHTML = '';
+        new QRCode(qrContainer, {
+          text: clientJoinUrl,
+          width: 110,
+          height: 110,
+          colorDark: "#1e1b4b",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
     }
 
     const btnStart = document.getElementById('btn-start');
