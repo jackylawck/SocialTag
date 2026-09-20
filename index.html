@@ -28,9 +28,13 @@
         <p class="text-xs text-slate-500" data-i18n="entry_subtitle">請選擇你的身份以進入房間</p>
       </div>
 
+      <!-- 房間號碼輸入與隨機開房 -->
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1" data-i18n="room_label">房間號碼</label>
-        <input id="input-room" type="text" value="" placeholder="eg. 0725" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="flex justify-between items-center mb-1">
+          <label class="block text-xs font-semibold text-slate-600" data-i18n="room_label">房間號碼</label>
+          <button type="button" id="btn-random-room" class="text-xs text-indigo-600 hover:underline">🎲 隨機新房</button>
+        </div>
+        <input id="input-room" type="text" value="" placeholder="留空將自動生成專屬房號" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
       </div>
 
       <div class="space-y-3 pt-2">
@@ -73,6 +77,15 @@
           <span class="lang-switch-text">EN</span>
         </button>
       </div>
+    </div>
+
+    <!-- 🌟 主持人大螢幕專屬：學員入場邀請盒 -->
+    <div id="host-invite-box" class="hidden bg-indigo-50/80 border border-indigo-100 rounded-xl p-3 text-center space-y-1.5">
+      <div class="text-xs font-semibold text-indigo-900">📱 學員請用手機瀏覽以下網址入場：</div>
+      <div class="font-mono text-xs text-indigo-600 break-all select-all bg-white py-1.5 px-2.5 rounded-lg border border-indigo-200 inline-block shadow-sm" id="invite-url-text">
+        --
+      </div>
+      <div class="text-xs text-slate-500">專屬房號：<span id="invite-room-code" class="font-bold text-indigo-700 text-sm font-mono">--</span></div>
     </div>
 
     <!-- 狀態資訊面板 -->
