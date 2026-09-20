@@ -19,16 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputName = document.getElementById('input-name');
     const btnRandom = document.getElementById('btn-random-room');
 
-    // 🎲 隨機產生獨立房號 (例如: tag-6391)
+    // 🎲 隨機產生 6 位純數字獨立房號 (100000 - 999999)
+    const generate6DigitRoom = () => String(Math.floor(100000 + Math.random() * 900000));
+
     if (btnRandom) {
       btnRandom.onclick = () => {
-        inputRoom.value = `tag-${Math.floor(1000 + Math.random() * 9000)}`;
+        inputRoom.value = generate6DigitRoom();
       };
     }
 
-    // 🖥️ 主持人進入：自訂房號或留空自動產生全新專屬房號
+    // 🖥️ 主持人進入：自訂房號或留空自動產生全新 6 位數字專屬房號
     document.getElementById('btn-join-host').onclick = () => {
-      const room = inputRoom.value.trim() || `tag-${Math.floor(1000 + Math.random() * 9000)}`;
+      const room = inputRoom.value.trim() || generate6DigitRoom();
       window.location.search = `?room=${encodeURIComponent(room)}&role=host`;
     };
 
