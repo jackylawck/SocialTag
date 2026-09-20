@@ -35,9 +35,18 @@ const UI = {
       if (window.clientSession) window.clientSession.handleReject(data);
       this.render();
     } else if (data.type === 'JOIN_REJECTED') {
-      document.getElementById('room-status').innerText = I18n.t('missed_start');
-      document.getElementById('participant-list').innerHTML =
-        `<div class="text-center text-slate-400 py-6 text-sm">${I18n.t('missed_desc')}</div>`;
+      // 🌟 分流處理：人數已滿 vs 錯過開場
+      if (data.reason === 'FULL') {
+        document.getElementById('room-status').innerText = I18n.t('room_full_title');
+        document.getElementById('participant-list').innerHTML =
+          `<div class="text-center text-rose-500 py-6 text-sm font-medium">
+            ${I18n.t('room_full_desc', { max: data.max || 50 })}
+          </div>`;
+      } else {
+        document.getElementById('room-status').innerText = I18n.t('missed_start');
+        document.getElementById('participant-list').innerHTML =
+          `<div class="text-center text-slate-400 py-6 text-sm">${I18n.t('missed_desc')}</div>`;
+      }
       document.getElementById('timer-display').innerText = '--:--';
       document.getElementById('sticker-box').classList.add('hidden');
     }
