@@ -3,7 +3,8 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get('room') || 'room_test';
+  // 1. 預設 fallback 房號改為 0725
+  const roomId = urlParams.get('room') || '0725';
   const role = urlParams.get('role');
   const nameParam = urlParams.get('name');
 
@@ -15,16 +16,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('entry-modal');
     modal.classList.remove('hidden');
 
+    const inputRoom = document.getElementById('input-room');
+    const inputName = document.getElementById('input-name');
+
+    // 主持人進入邏輯
     document.getElementById('btn-join-host').onclick = () => {
-      const room = document.getElementById('input-room').value.trim() || 'room_test';
+      const room = inputRoom.value.trim() || '0725';
       window.location.search = `?room=${encodeURIComponent(room)}&role=host`;
     };
 
-    document.getElementById('btn-join-client').onclick = () => {
-      const room = document.getElementById('input-room').value.trim() || 'room_test';
-      const name = document.getElementById('input-name').value.trim() || `學員_${uid(3)}`;
+    // 學員進入邏輯
+    const joinAsClient = () => {
+      const room = inputRoom.value.trim() || '0725';
+      const name = inputName.value.trim() || `學員_${uid(3)}`;
       window.location.search = `?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
     };
+
+    document.getElementById('btn-join-client').onclick = joinAsClient;
+
+    // 支援學員打完名字直接撳鍵盤 Enter 送出
+    inputName.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') joinAsClient();
+    });
+
     return;
   }
 
