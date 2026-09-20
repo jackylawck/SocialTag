@@ -3,13 +3,13 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const roomId = urlParams.get('room') || '0725';
+  let roomId = urlParams.get('room');
   const role = urlParams.get('role');
   const nameParam = urlParams.get('name');
 
   UI.renderStaticTexts();
 
-  const hasIdentity = role === 'host' || !!nameParam;
+  const hasIdentity = (role === 'host' || !!nameParam) && !!roomId;
 
   if (!hasIdentity) {
     const modal = document.getElementById('entry-modal');
@@ -17,23 +17,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const inputRoom = document.getElementById('input-room');
     const inputName = document.getElementById('input-name');
+    const btnRandom = document.getElementById('btn-random-room');
 
-    // 主持人進入邏輯
+    // 🎲 隨機產生獨立房號 (例如: tag-6391)
+    if (btnRandom) {
+      btnRandom.onclick = () => {
+        inputRoom.value = `tag-${Math.floor(1000 + Math.random() * 9000)}`;
+      };
+    }
+
+    // 🖥️ 主持人進入：自訂房號或留空自動產生全新專屬房號
     document.getElementById('btn-join-host').onclick = () => {
-      const room = inputRoom.value.trim() || '0725';
+      const room = inputRoom.value.trim() || `tag-${Math.floor(1000 + Math.random() * 9000)}`;
       window.location.search = `?room=${encodeURIComponent(room)}&role=host`;
     };
 
-    // 學員進入邏輯
+    // 📱 學員進入：必須具備房號
     const joinAsClient = () => {
-      const room = inputRoom.value.trim() || '0725';
+      const room = inputRoom.value.trim() || roomId;
+      if (!room) {
+        inputRoom.focus();
+        return;
+      }
       const name = inputName.value.trim() || `學員_${uid(3)}`;
       window.location.search = `?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
     };
 
     document.getElementById('btn-join-client').onclick = joinAsClient;
 
-    // 支援學員打完名字直接按 Enter 送出
+    // 支援輸入完名字直接按 Enter 鍵進入
     inputName.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') joinAsClient();
     });
@@ -45,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const myName = nameParam || (isHost ? '主持人' : `學員_${uid(3)}`);
   const myPeerId = isHost ? 'host_peer' : getPersistentPeerId(roomId);
 
-  // 渲染大螢幕獨立房號顯示標籤
+  // 渲染獨立房號標籤
   const displayRoomEl = document.getElementById('display-room-id');
   if (displayRoomEl) displayRoomEl.innerText = roomId;
 
@@ -58,6 +70,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('host-controls').classList.remove('hidden');
     document.getElementById('sticker-box').classList.add('hidden');
     document.getElementById('client-view').classList.add('hidden');
+
+    // 🌟 填入大螢幕學員專屬邀請連結與房號
+    const inviteBox = document.getElementById('host-invite-box');
+    if (inviteBox) {
+      inviteBox.classList.remove('hidden');
+      const clientJoinUrl = `${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(roomId)}`;
+      const inviteUrlEl = document.getElementById('invite-url-text');
+      const inviteCodeEl = document.getElementById('invite-room-code');
+      if (inviteUrlEl) inviteUrlEl.innerText = clientJoinUrl;
+      if (inviteCodeEl) inviteCodeEl.innerText = roomId;
+    }
 
     const btnStart = document.getElementById('btn-start');
     const btnReclaim = document.getElementById('btn-reclaim');
@@ -87,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // 重設房間：清空硬碟快照並重載頁面回到乾淨的 LOBBY
+    // 重設房間：清空快照並重載回乾淨的 LOBBY
     if (btnReset) {
       btnReset.onclick = () => {
         if (confirm('確定要清空資料並重新開局？全場學員將重回 LOBBY 狀態。')) {
