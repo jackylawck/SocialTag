@@ -54,7 +54,7 @@
     style-src 'self' 'unsafe-inline';
     img-src 'self' data: blob: https://jackylawck.github.io;
     font-src 'self' data:;
-    connect-src 'self';
+    connect-src 'self' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;
     object-src 'none';
     base-uri 'self';
     form-action 'none';
@@ -204,6 +204,14 @@
         <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="list_received">我身上收到的標籤 (物歸原主用)</h2>
         <div id="received-list" class="space-y-1"></div>
       </div>
+    </div>
+
+    <!-- 🛡️ 專業合規與私隱聲明頁尾 -->
+    <div class="text-center pt-4 border-t border-slate-100 text-[10px] text-slate-400 leading-relaxed">
+      <span>🛡️ ISO 27001 & 27701 Aligned • Privacy by Design (Zero-Server) • </span>
+      <a href="https://github.com/jackylawck/SocialTag/blob/main/GOVERNANCE_AND_PRIVACY.md" target="_blank" rel="noopener noreferrer" class="underline hover:text-indigo-600 transition">
+        Governance & Compliance
+      </a>
     </div>
   </div>
 </body>
