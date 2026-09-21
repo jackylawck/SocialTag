@@ -1,13 +1,70 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-HK" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Social Tag 到處留名</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+  
+  <!-- 🔍 Google 站長驗證 -->
+  <meta name="google-site-verification" content="JZ5UohX-CcP_fQV0_DI9VadkKY4ZoTTkUifL88-fIcY" />
+
+  <!-- 🔍 基礎 SEO 核心標籤 -->
+  <title>🏷️ Social Tag 到處留名 | 互動破冰遊戲 (Social Tag Icebreaker)</title>
+  <meta name="description" content="Social Tag 到處留名是一款為企業培訓、大型工作坊及團隊破冰設計的輕量級互動遊戲。純前端零後端架構，支援 6 位數多房獨立運作、動態 QR Code 秒速入場、50人防爆隔離與即時中英切換。">
+  <meta name="keywords" content="破冰遊戲, 企業培訓, 團隊建立, Team Building, Icebreaker, Social Tag, QR Code入場, PWA, 數位破冰, 到處留名, 雙語互動">
+  <meta name="author" content="Social Tag Lab">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://jackylawck.github.io/SocialTag/">
+
+  <!-- 🌐 Open Graph / Facebook / LinkedIn 社交分享卡片 -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jackylawck.github.io/SocialTag/">
+  <meta property="og:title" content="🏷️ Social Tag 到處留名 | 企業培訓互動破冰神器">
+  <meta property="og:description" content="告別尷尬破冰！手機掃描 QR Code 即刻入場，貼名牌、換標籤、物歸原主，大螢幕即時榜單互動。">
+  <meta property="og:image" content="https://jackylawck.github.io/SocialTag/SocialTag512icon.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Social Tag 到處留名遊戲圖示">
+  <meta property="og:locale" content="zh_HK">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:site_name" content="Social Tag 到處留名">
+
+  <!-- 🐦 Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="🏷️ Social Tag 到處留名 | 互動破冰遊戲">
+  <meta name="twitter:description" content="純前端 Serverless 社交名牌破冰遊戲，掃碼直入，流暢支援多房獨立對抗與大螢幕投影。">
+  <meta name="twitter:image" content="https://jackylawck.github.io/SocialTag/SocialTag512icon.png">
+
+  <!-- 📱 PWA 與手機主畫面圖示支援 -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="192x192" href="SocialTag192icon.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="SocialTag512icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="SocialTag192icon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="SocialTag512icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Social Tag">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="application-name" content="Social Tag">
+
+  <!-- 🛡️ 企業級安全策略：嚴格 Content Security Policy (CSP) 與權限隔離 -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: blob: https://jackylawck.github.io;
+    font-src 'self' data:;
+    connect-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'none';
+  ">
+  <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), interest-cohort=()">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+
+  <!-- 依序載入腳本與樣式庫 -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 🌟 極速生成 QR Code 的純前端庫 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- 依序載入腳本 -->
   <script src="js/i18n.js" defer></script>
   <script src="js/utils.js" defer></script>
   <script src="js/game.js" defer></script>
